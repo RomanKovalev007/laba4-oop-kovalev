@@ -3,18 +3,19 @@
 #include <vector>
 #include <cmath>
 #include <stdexcept>
+#include <memory>
 
 template<typename T>
 class Triangle : public Figure<T> {
-    Point<T> points[3];
+    std::unique_ptr<Point<T>[]> points;
 
 public:
-    Triangle() {
+    Triangle() : points(std::make_unique<Point<T>[]>(3)) {
         for (size_t i = 0; i < 3; ++i)
             points[i] = Point<T>();
     }
 
-    Triangle(const std::vector<Point<T>> &newPoints) {
+    Triangle(const std::vector<Point<T>> &newPoints) : points(std::make_unique<Point<T>[]>(3)) {
         if (newPoints.size() != 3)
             throw std::invalid_argument("it is not a triangle");
         for (size_t i = 0; i < 3; ++i)
@@ -25,20 +26,17 @@ public:
         sort();
     }
 
-    Triangle(const Triangle& other) {
+    Triangle(const Triangle& other) : points(std::make_unique<Point<T>[]>(3)) {
         for (size_t i = 0; i < 3; i++) {
             points[i] = other.points[i];
         }
     }
 
-    Triangle(Triangle&& other) noexcept {
-        for (size_t i = 0; i < 3; i++) {
-            points[i] = std::move(other.points[i]);
-        }
-    }
+    Triangle(Triangle&& other) noexcept : points(std::move(other.points)) {}
 
     Triangle& operator=(const Triangle& other) {
         if (this != &other) {
+            points = std::make_unique<Point<T>[]>(3);
             for (size_t i = 0; i < 3; i++) {
                 points[i] = other.points[i];
             }
@@ -48,9 +46,7 @@ public:
 
     Triangle& operator=(Triangle&& other) noexcept {
         if (this != &other) {
-            for (size_t i = 0; i < 3; i++) {
-                points[i] = std::move(other.points[i]);
-            }
+            points = std::move(other.points);
         }
         return *this;
     }
@@ -97,6 +93,10 @@ public:
             throw std::invalid_argument("it is not a triangle");
         }
         sort();
+    }
+
+    virtual std::unique_ptr<Figure<T>> clone() const override {
+        return std::make_unique<Triangle>(*this);
     }
 
 private:

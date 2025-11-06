@@ -1,9 +1,9 @@
-#include "../include/point.h"
-#include "../include/figure.h"
-#include "../include/triangle.h"
-#include "../include/square.h"
-#include "../include/rectangle.h"
-#include "../include/array.h"
+#include "point.h"
+#include "figure.h"
+#include "triangle.h"
+#include "square.h"
+#include "rectangle.h"
+#include "array.h"
 #include <memory>
 #include <iostream>
 #include <sstream>
@@ -14,7 +14,7 @@ void array_figures() {
     std::cout << " array figures menu " << std::endl;
     int option = -1;
 
-    Array<std::shared_ptr<Figure<double>>> figures;
+    Array<Figure<double>> figures;
 
     while (option != 0) {
         std::cout << "1. add triangle\n";
@@ -31,24 +31,24 @@ void array_figures() {
         try {
             switch (option) {
             case 1: {
-                Triangle<double> triangle;
+                auto triangle = std::make_shared<Triangle<double>>();
                 std::cout << "enter 3 points (x y):\n";
-                std::cin >> triangle;
-                figures.push(std::make_shared<Triangle<double>>(triangle));
+                std::cin >> *triangle;
+                figures.push(triangle);
                 std::cout << "triangle added\n";
                 break;
             }
             case 2: {
-                std::cout << "enter 4 points (x y):\n";
                 auto square = std::make_shared<Square<double>>();
+                std::cout << "enter 4 points (x y):\n";
                 std::cin >> *square;
                 figures.push(square);
                 std::cout << "square added\n";
                 break;
             }
             case 3: {
-                std::cout << "enter 4 points (x y):\n";
                 auto rectangle = std::make_shared<Rectangle<double>>();
+                std::cout << "enter 4 points (x y):\n";
                 std::cin >> *rectangle;
                 figures.push(rectangle);
                 std::cout << "rectangle added\n";
@@ -60,11 +60,11 @@ void array_figures() {
                     break;
                 }
                 std::cout << "enter index: ";
-                    size_t idx;
-                    std::cin >> idx;
-                    figures.remove(idx);
-                    std::cout << "figure removed\n";
-                    break;
+                size_t idx;
+                std::cin >> idx;
+                figures.remove(idx);
+                std::cout << "figure removed\n";
+                break;
             }
             case 5: {
                 std::cout << figures;
@@ -74,17 +74,15 @@ void array_figures() {
                 std::cout << "total area: " << figures.totalArea() << std::endl;
                 break;
             }
-            case 0:{
-                delete(&figures);
+            case 0:
                 break;
-            }
-            default: std::cout << "invalid option\n";
+            default: 
+                std::cout << "invalid option\n";
             }
         } catch (const std::exception &e) {
             std::cout << "error: " << e.what() << "\n";
         }
     }
-    
 }
 
 void array_derived() {
@@ -103,7 +101,7 @@ void array_derived() {
         try {
             switch (fig) {
             case 1: {
-                Array<std::shared_ptr<Triangle<double>>> triangles;
+                Array<Triangle<double>> triangles;
                 int option = -1;
 
                 while (option != 0) {
@@ -146,11 +144,10 @@ void array_derived() {
                             std::cout << "total area: " << triangles.totalArea() << std::endl;
                             break;
                         }
-                        case 0:{
-                            delete(&triangles);
+                        case 0:
                             break;
-                        }
-                        default: std::cout << "invalid option\n";
+                        default: 
+                            std::cout << "invalid option\n";
                         }
                     } catch (const std::exception &e) {
                         std::cout << "error: " << e.what() << "\n";
@@ -159,7 +156,7 @@ void array_derived() {
                 break;
             }
             case 2: {
-                Array<std::shared_ptr<Square<double>>> squares;
+                Array<Square<double>> squares;
                 int option = -1;
 
                 while (option != 0) {
@@ -202,11 +199,10 @@ void array_derived() {
                             std::cout << "total area: " << squares.totalArea() << std::endl;
                             break;
                         }
-                        case 0:{
-                            delete(&squares);
+                        case 0:
                             break;
-                        }
-                        default: std::cout << "invalid option\n";
+                        default: 
+                            std::cout << "invalid option\n";
                         }
                     } catch (const std::exception &e) {
                         std::cout << "error: " << e.what() << "\n";
@@ -215,7 +211,7 @@ void array_derived() {
                 break;
             }
             case 3: {
-                Array<std::shared_ptr<Rectangle<double>>> rectangles;
+                Array<Rectangle<double>> rectangles;
                 int option = -1;
 
                 while (option != 0) {
@@ -232,10 +228,10 @@ void array_derived() {
                         switch (option) {
                         case 1: {
                             auto rectangle = std::make_shared<Rectangle<double>>();
-                            std::cout << "enter 3 points (x y):\n";
+                            std::cout << "enter 4 points (x y):\n";
                             std::cin >> *rectangle;
                             rectangles.push(rectangle);
-                            std::cout << "triangle added\n";
+                            std::cout << "rectangle added\n";
                             break;
                         }
                         case 2: {
@@ -255,14 +251,13 @@ void array_derived() {
                             break;
                         }
                         case 4: {
-                            std::cout << "total area: " <<rectangles.totalArea() << std::endl;
+                            std::cout << "total area: " << rectangles.totalArea() << std::endl;
                             break;
                         }
-                        case 0:{
-                            delete(&rectangles);
+                        case 0:
                             break;
-                        }
-                        default: std::cout << "invalid option\n";
+                        default: 
+                            std::cout << "invalid option\n";
                         }
                     } catch (const std::exception &e) {
                         std::cout << "error: " << e.what() << "\n";
@@ -270,10 +265,10 @@ void array_derived() {
                 }
                 break;
             }
-            case 0:{
+            case 0:
                 break;
-            }
-            default: std::cout << "invalid figure\n";
+            default: 
+                std::cout << "invalid figure\n";
             }
         } catch (const std::exception &e) {
             std::cout << "error: " << e.what() << "\n";
@@ -301,10 +296,10 @@ int main() {
                 array_derived();
                 break;
             }
-            case 0:{
+            case 0:
                 break;
-            }
-            default: std::cout << "invalid option\n";
+            default: 
+                std::cout << "invalid option\n";
             }
             std::cout << "\n program completed " << std::endl;
         } catch (const std::exception &e) {

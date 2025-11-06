@@ -1,18 +1,20 @@
 #pragma once
 #include "figure.h"
 #include <cmath>
-
+#include <memory>
+#include <vector>
 
 template<typename T>
 class Square : public Figure<T> {
-    Point<T> points[4];
+    std::unique_ptr<Point<T>[]> points;
+
 public:
-    Square(){
+    Square() : points(std::make_unique<Point<T>[]>(4)) {
         for (size_t i = 0; i < 4; ++i)
             points[i] = Point<T>();
     }
 
-    Square(const std::vector<Point<T>> &newPoints) {
+    Square(const std::vector<Point<T>> &newPoints) : points(std::make_unique<Point<T>[]>(4)) {
         if (newPoints.size() != 4)
             throw std::invalid_argument("it is not a square");
         for (size_t i = 0; i < 4; ++i)
@@ -23,20 +25,17 @@ public:
         }
     }
     
-    Square(const Square& other) {
+    Square(const Square& other) : points(std::make_unique<Point<T>[]>(4)) {
         for (size_t i = 0; i < 4; i++) {
             points[i] = other.points[i];
         }
     }
 
-    Square(Square&& other) noexcept {
-        for (size_t i = 0; i < 4; i++) {
-            points[i] = std::move(other.points[i]);
-        }
-    }
+    Square(Square&& other) noexcept : points(std::move(other.points)) {}
 
     Square& operator=(const Square& other){
         if (this != &other) {
+            points = std::make_unique<Point<T>[]>(4);
             for (size_t i = 0; i < 4; i++) {
                 points[i] = other.points[i];
             }
@@ -46,9 +45,7 @@ public:
 
     Square& operator=(Square&& other) noexcept{
         if (this != &other) {
-            for (size_t i = 0; i < 4; i++) {
-                points[i] = std::move(other.points[i]);
-            }
+            points = std::move(other.points);
         }
         return *this;
     }
@@ -70,9 +67,9 @@ public:
         }
         return Point<T>(x / 4, y / 4);
     }
+
     double area() const override{
         double a = distance(points[0], points[1]);
-
         return a*a;
     }
 
@@ -91,6 +88,10 @@ public:
         if (!isSquare()){
             throw std::invalid_argument("it is not a square");
         }
+    }
+
+    virtual std::unique_ptr<Figure<T>> clone() const override {
+        return std::make_unique<Square>(*this);
     }
 
 private:

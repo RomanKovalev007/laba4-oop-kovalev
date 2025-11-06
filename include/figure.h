@@ -6,10 +6,14 @@
 template <typename T>
 class Figure {
 public:
+    using value_type = T;
+    
     virtual ~Figure() = default;
 
     virtual Point<T> gcenter() const = 0;
     virtual double area() const = 0;
+    
+    virtual std::unique_ptr<Figure<T>> clone() const = 0;
 
     virtual operator double() const { 
         return area(); 
@@ -34,4 +38,3 @@ std::istream &operator>>(std::istream &is, Figure<T> &figure) {
     figure.read(is);
     return is;
 }
-

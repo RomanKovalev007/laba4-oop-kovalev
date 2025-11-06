@@ -1,20 +1,20 @@
 #pragma once
-
 #include "figure.h"
 #include <vector>
 #include <cmath>
-
+#include <memory>
 
 template<typename T>
 class Rectangle : public Figure<T> {
-    Point<T> points[4];
+    std::unique_ptr<Point<T>[]> points;
+
 public:
-    Rectangle(){
+    Rectangle() : points(std::make_unique<Point<T>[]>(4)) {
         for (size_t i = 0; i < 4; ++i)
             points[i] = Point<T>();
     }
 
-    Rectangle(const std::vector<Point<T>> &newPoints) {
+    Rectangle(const std::vector<Point<T>> &newPoints) : points(std::make_unique<Point<T>[]>(4)) {
         if (newPoints.size() != 4)
             throw std::invalid_argument("it is not a rectangle");
         for (size_t i = 0; i < 4; ++i)
@@ -25,20 +25,17 @@ public:
         }
     }
 
-    Rectangle(const Rectangle& other){
+    Rectangle(const Rectangle& other) : points(std::make_unique<Point<T>[]>(4)) {
         for (size_t i = 0; i < 4; i++) {
             points[i] = other.points[i];
         }
     }
 
-    Rectangle(Rectangle&& other) noexcept{
-        for (size_t i = 0; i < 4; i++) {
-            points[i] = std::move(other.points[i]);
-        }
-    }
+    Rectangle(Rectangle&& other) noexcept : points(std::move(other.points)) {}
     
     Rectangle& operator=(const Rectangle& other){
         if (this != &other) {
+            points = std::make_unique<Point<T>[]>(4);
             for (size_t i = 0; i < 4; i++) {
                 points[i] = other.points[i];
             }
@@ -48,9 +45,7 @@ public:
 
     Rectangle& operator=(Rectangle&& other) noexcept{
         if (this != &other) {
-            for (size_t i = 0; i < 4; i++) {
-                points[i] = std::move(other.points[i]);
-            }
+            points = std::move(other.points);
         }
         return *this;
     }
@@ -64,7 +59,6 @@ public:
         return true;
     }
     
-    
     Point<T> gcenter() const override{
         T x = 0, y = 0;
         for (size_t i = 0; i < 4; i++) {
@@ -77,7 +71,6 @@ public:
     double area() const override {
         double a = distance(points[0], points[1]);
         double b = distance(points[0], points[2]);
-
         return a*b;
     }
     
@@ -98,7 +91,11 @@ public:
         }
     }
 
-    private:
+    virtual std::unique_ptr<Figure<T>> clone() const override {
+        return std::make_unique<Rectangle>(*this);
+    }
+
+private:
     void sort(){
         for (int j = 0; j < 3; j++){
             for (int i = 0; i < 3 - j; i++){
